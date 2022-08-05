@@ -54,12 +54,11 @@ const createData = async ({ fileName, data, dataType }) => {
 //     }
 // }
 const updateData = async ({ fileName, data, dataType }) => {
-
   if (dataType === "task") {
     const currentData = await readData(fileName);
-    const rootTask = currentData.tasks.rows[0];
+    let rootTask = currentData.tasks.rows[0];
     if (rootTask.id === data.id) {
-      rootTask.name = data.name;
+      rootTask = { ...rootTask, ...data};
       currentData.tasks.rows[0] = { ...rootTask };
       await fs.writeFile(fileName, JSON.stringify(currentData));
       return { message: `root task ${data.id} updated` };
@@ -67,7 +66,7 @@ const updateData = async ({ fileName, data, dataType }) => {
     // It's a child that we need to update
     let tasks = currentData.tasks.rows[0].children;
     let taskToUpdate = tasks.find((t) => t.id === data.id);
-    taskToUpdate = { ...taskToUpdate, name: data.name };
+    taskToUpdate = { ...taskToUpdate, ...data };
     console.log(`taskToUpdate ${JSON.stringify(taskToUpdate, null, 2)}`);
     const updatedTasks = tasks.map((t) =>
       t.id === taskToUpdate.id ? taskToUpdate : t
@@ -86,7 +85,7 @@ const updateData = async ({ fileName, data, dataType }) => {
   }
 };
 
-// body for to task delete is:
+// body for a task to delete is:
 // {
 //     "type": "sync",
 //     "requestId": 16596187058441,
@@ -115,7 +114,7 @@ const updateData = async ({ fileName, data, dataType }) => {
 //     }
 //   }
 const deleteData = ({ fileName, data, dataType }) => {
-    // TODO
-}
+  // TODO
+};
 
 module.exports = { readData, createData, updateData, deleteData };
